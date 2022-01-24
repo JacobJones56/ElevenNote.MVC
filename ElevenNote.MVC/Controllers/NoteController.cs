@@ -36,14 +36,24 @@ namespace ElevenNote.MVC.Controllers
                 return View(model);
             }
 
-            var userId = Guid.Parse(User.Identity.GetUserId());
-            var service = new NoteService(userId);
+            var service = CreateNoteService();
 
-            service.CreateNote(model);
+          if (service.CreateNote(model))
+            {
+                TempData["SaveResult"] = "Your note was created.";
+                return RedirectToAction("Index");
+            }
+            ModelState.AddModelError("", "Note could not be created.");
 
             return RedirectToAction("Index");
         }
 
+        private NoteService CreateNoteService()
+        {
+            var userId = Guid.Parse(User.Identity.GetUserId());
+            var service = new NoteService(userId);
+            return service;
+        }
 
     }
 }
